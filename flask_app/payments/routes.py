@@ -1,7 +1,7 @@
 from flask import Blueprint, render_template, url_for, redirect, request, flash
 from flask_login import current_user
 
-from ..forms import SearchForm
+from ..forms import SearchForm, SendPaymentForm
 from ..models import User
 from ..utils import current_time
 
@@ -9,7 +9,7 @@ payments = Blueprint('payments', __name__)
 
 @payments.route("/transaction_history/<friend>")
 def send_payment(friend, amount):
-    form = SendPaymentForm():
+    form = SendPaymentForm()
     if form.validate_on_submit() and current_user.is_authenticated:
         current_user.balance -= amount
         friend.balance += amount
@@ -20,7 +20,7 @@ def send_payment(friend, amount):
 
 @payments.route("/transaction_history/<friend>")
 def request_payment(friend, amount):
-    form = SendPaymentForm():
+    form = SendPaymentForm()
     if form.validate_on_submit() and current_user.is_authenticated:
         return redirect(url_for("payments.transaction_history"))
     return render_template("account.html", title="Account", username_form=username_form)

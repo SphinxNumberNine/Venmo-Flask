@@ -2,7 +2,6 @@ from flask_login import UserMixin
 from datetime import datetime
 from . import db, login_manager
 from . import config
-from .utils import current_time
 import base64
 
 @login_manager.user_loader
@@ -16,7 +15,7 @@ class User(db.Document, UserMixin):
     lastname = db.StringField(required=True)
     password = db.StringField(required=True)
     balance = db.IntegerField(required=True)
-    friends = db.ListField(ReferenceField(User))
+    friends = db.ListField(db.ReferenceField(User))
 
     # Returns unique string identifying our object
     def get_id(self):
