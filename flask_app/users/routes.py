@@ -1,10 +1,9 @@
-
 from flask import Blueprint, redirect, url_for, render_template, flash, request
 from flask_login import current_user, login_required, login_user, logout_user
 
 from .. import bcrypt
-from ..forms import RegistrationForm, LoginForm, UpdateUsernameForm
-from ..models import User
+from ..forms import RegistrationForm, LoginForm, UpdateUsernameForm, UpdatePasswordForm, AddFriendForm
+from ..models import User, Payment
 
 users = Blueprint('users', __name__)
 
@@ -23,7 +22,7 @@ def register():
 @users.route("/login", methods=["GET", "POST"])
 def login():
     if current_user.is_authenticated:
-        return redirect(url_for("movies.index"))
+        return redirect(url_for("users.index"))
     form = LoginForm()
     if form.validate_on_submit():
         user = User.objects(username=form.username.data).first()
@@ -47,7 +46,7 @@ def index():
 @login_required
 def logout():
     logout_user()
-    return redirect(url_for("movies.index"))
+    return redirect(url_for("users.index"))
 
 @users.route("/account", methods=["GET", "POST"])
 @login_required
@@ -67,10 +66,10 @@ def account():
 @users.route("/search-user/<name>", methods=["GET"])
 @login_required
 def user_search(name):
-    try:
-        #Query database to find friend
-        results = movie_client.search(name)
-    except ValueError as e:
-        flash(str(e))
-        return redirect(url_for("payments.transaction_history"))
+    #try:
+    #Query database to find friend
+    results = db.getCollection("users")
+    #except ValueError as e:
+    #    flash(str(e))
+    #    return redirect(url_for("payments.transaction_history"))
     return render_template("query.html", results=results)

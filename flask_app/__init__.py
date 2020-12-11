@@ -17,14 +17,13 @@ import os
 db = MongoEngine()
 login_manager = LoginManager()
 bcrypt = Bcrypt()
-movie_client = MovieClient(os.environ.get("OMDB_API_KEY"))
 
 from .users.routes import users
 from .payments.routes import payments
 
 #app = Flask(__name__)
 
-@app.route("/")
+#@app.route("/")
 def default_route():
     return "Venmo Clone"
 

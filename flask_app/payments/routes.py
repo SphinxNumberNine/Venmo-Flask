@@ -1,8 +1,8 @@
 from flask import Blueprint, render_template, url_for, redirect, request, flash
 from flask_login import current_user
 
-from ..forms import SearchForm, SendPaymentForm
-from ..models import User
+from ..forms import SendPaymentForm, RequestPaymentForm
+from ..models import User, Payment
 from ..utils import current_time
 
 payments = Blueprint('payments', __name__)

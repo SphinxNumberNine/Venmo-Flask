@@ -2,6 +2,7 @@ from flask_login import UserMixin
 from datetime import datetime
 from . import db, login_manager
 from . import config
+from .utils import current_time
 import base64
 
 @login_manager.user_loader
@@ -14,8 +15,8 @@ class User(db.Document, UserMixin):
     firstname = db.StringField(required=True)
     lastname = db.StringField(required=True)
     password = db.StringField(required=True)
-    balance = db.IntegerField(required=True)
-    friends = db.ListField(db.ReferenceField(User))
+    balance = db.FloatField(required=True, min_value=0.0, max_value=10000.0)
+    friends = db.ListField(db.ReferenceField('self'))
 
     # Returns unique string identifying our object
     def get_id(self):
@@ -26,5 +27,5 @@ class Payment(db.Document):
     receiver = db.ReferenceField(User, required=True)
     comment = db.StringField(required=True, min_length=1, max_length=500)
     date = db.StringField(required=True)
-    amount = db.IntegerField(required=True)
+    amount = db.FloatField(required=True, min_value=0.01, max_value=10000.0)
     

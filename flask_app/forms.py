@@ -3,7 +3,7 @@ from flask_login import current_user
 from flask_wtf import FlaskForm
 from flask_wtf.file import FileField, FileRequired, FileAllowed
 from werkzeug.utils import secure_filename
-from wtforms import StringField, IntegerField, SubmitField, TextAreaField, PasswordField
+from wtforms import StringField, SubmitField, TextAreaField, PasswordField
 from wtforms.validators import (
     InputRequired,
     DataRequired,
@@ -14,13 +14,7 @@ from wtforms.validators import (
     ValidationError,
 )
 
-from .models import User
-
-class SearchForm(FlaskForm):
-    search_query = StringField(
-        "Query", validators=[InputRequired(), Length(min=1, max=100)]
-    )
-    submit = SubmitField("Search")
+from .models import User, Payment
 
 class RegistrationForm(FlaskForm):
     username = StringField(
@@ -77,11 +71,7 @@ class SendPaymentForm(FlaskForm):
         "Comment", validators=[InputRequired(), Length(min=5, max=500)]
     )
     send = SubmitField("Send Payment")
-    #decline = SubmitField("Decline Payment")
 
-class SendFriendRequestForm(FlaskForm):
+class AddFriendForm(FlaskForm):
+    #add then and they add back
     submit = SubmitField("Send Request")
-
-class AcceptFriendRequestForm(FlaskForm):
-    accept = SubmitField("Accept Request")
-    #decline = SubmitField("Decline Request")
