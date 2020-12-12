@@ -3,6 +3,7 @@
 <div class="row">
     <div class="col">
         <h1>Hey, {{ current_user.username }}!</h1>
+        <h3>Your current balance is {{ "$%.2f"|format(current_user.balance) }}</h3>
     </div>
 </div>
 <div class="row">
@@ -25,6 +26,51 @@
                 {{ username_form.submit }}
             </div>
         </form>
+        <form action="" method="post">
+            {{ password_form.csrf_token }}
+            <div class="form-group">
+                {{ password_form.password.label(class="form-control-label") }}
+                {{ password_form.password(class="form-control form-control-lg") }}
+
+                {% if password_form.password.errors %}
+                <div class="alert alert-warning" role="alert">
+                    {% for error in password_form.password.errors %}
+                    <span>{{ error }}</span>
+                    {% endfor %}
+                </div>
+                {% endif %}
+            </div>
+            <div class="form-group">
+                {{ password_form.submit }}
+            </div>
+        </form>
+        <form action="" method="post">
+            {{ add_credits_form.csrf_token }}
+            <div class="form-group">
+                {{ add_credits_form.credit.label(class="form-control-label") }}
+                {{ add_credits_form.credit(class="form-control form-control-lg") }}
+
+                {% if add_credits_form.credit.errors %}
+                <div class="alert alert-warning" role="alert">
+                    {% for error in add_credits_form.credit.errors %}
+                    <span>{{ error }}</span>
+                    {% endfor %}
+                </div>
+                {% endif %}
+            </div>
+            <div class="form-group">
+                {{ add_credits_form.submit }}
+            </div>
+        </form>
+        <div>
+            <h3>Friends:</h3>
+            <ul>
+                {% for friend in friends %}
+                    <li><p>{{ friend[2] }}</p></li>
+                {% endfor %}
+            </ul>
+            
+        </div>
     </div>
 </div>
 {% endblock %}>

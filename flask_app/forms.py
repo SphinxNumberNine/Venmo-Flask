@@ -57,6 +57,10 @@ class UpdateUsernameForm(FlaskForm):
             if user is not None:
                 raise ValidationError("That username is already taken")
 
+class AddCreditsForm(FlaskForm):
+    credit = FloatField('Add Money To Account', validators=[InputRequired()])
+    submit = SubmitField('Add Money')
+
 class UpdatePasswordForm(FlaskForm):
     password = StringField(
         "Password", validators=[InputRequired(), Length(min=1, max=40)]

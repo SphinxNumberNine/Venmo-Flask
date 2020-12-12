@@ -2,7 +2,7 @@ from flask import Blueprint, redirect, url_for, render_template, flash, request
 from flask_login import current_user, login_required, login_user, logout_user
 
 from .. import bcrypt
-from ..forms import RegistrationForm, LoginForm, UpdateUsernameForm, UpdatePasswordForm, AddFriendForm
+from ..forms import RegistrationForm, LoginForm, UpdateUsernameForm, UpdatePasswordForm, AddFriendForm, AddCreditsForm
 from ..models import User, Payment
 
 users = Blueprint('users', __name__)
@@ -38,10 +38,11 @@ def login():
 @users.route("/", methods=["GET", "POST"])
 @login_required
 def index():
-    form = SearchForm()
-    if form.validate_on_submit():
-        return redirect(url_for("users.account"))
-    return render_template("index.html", form=form)
+    # form = SearchForm()
+    # if form.validate_on_submit():
+        # return redirect(url_for("users.account"))
+    # return render_template("index.html", form=form)
+    return "Venmo Clone"
 
 @users.route("/logout")
 @login_required
@@ -62,7 +63,14 @@ def account():
         current_user.modify(password=password_form.password.data)
         current_user.save()
         return redirect(url_for("users.account"))
-    return render_template("account.html", title="Account", username_form=username_form,)
+    add_credits_form = AddCreditsForm()
+    if add_credits_form.validate_on_submit():
+        new_balance = current_user.balance + add_credits_form.credit.data
+        current_user.modify(balance=new_balance)
+    friends = []
+    for friend in current_user.friends:
+        friends.append((friend.firstname, friend.lastname, friend.username))
+    return render_template("account.html", title="Account", username_form=username_form, password_form=password_form, add_credits_form=add_credits_form, friends = friends)
 
 @users.route("/search-user/<name>", methods=["GET"])
 @login_required
