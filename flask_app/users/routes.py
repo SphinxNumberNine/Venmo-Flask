@@ -67,10 +67,7 @@ def account():
     if add_credits_form.validate_on_submit():
         new_balance = current_user.balance + add_credits_form.credit.data
         current_user.modify(balance=new_balance)
-    friends = []
-    for friend in current_user.friends:
-        friends.append((friend.firstname, friend.lastname, friend.username))
-    return render_template("account.html", title="Account", username_form=username_form, password_form=password_form, add_credits_form=add_credits_form, friends = friends)
+    return render_template("account.html", title="Account", username_form=username_form, password_form=password_form, add_credits_form=add_credits_form)
 
 @users.route("/search-user/<name>", methods=["GET"])
 @login_required
@@ -82,3 +79,18 @@ def user_search(name):
     #    flash(str(e))
     #    return redirect(url_for("payments.transaction_history"))
     return render_template("query.html", results=results)
+
+@users.route("/friends", methods=["GET", "POST"])
+@login_required
+def friends():
+    add_friend_form = AddFriendForm()
+    if add_friend_form.validate_on_submit():
+        friend = User.objects(username=add_friend_form.username.data).first()
+        existing_friends = current_user.friends
+        existing_friends.append(friend)
+        current_user.modify(friends=existing_friends)
+        return redirect(url_for('users.friends'))
+    friends = []
+    for friend in current_user.friends:
+        friends.append((friend.firstname, friend.lastname, friend.username))
+    return render_template("friends.html", friends=friends, add_friend_form=add_friend_form)

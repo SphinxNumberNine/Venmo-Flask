@@ -81,4 +81,10 @@ class SendPaymentForm(FlaskForm):
 
 class AddFriendForm(FlaskForm):
     #add then and they add back
-    submit = SubmitField("Send Request")
+    username = StringField(label="Friend Username", validators=[InputRequired()])
+    submit = SubmitField("Add Friend")
+
+    def validate_username(self, username):
+        user = User.objects(username=username.data).first()
+        if user is None:
+            raise ValidationError("No user found with that username")
