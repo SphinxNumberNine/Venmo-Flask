@@ -3,7 +3,7 @@ from flask_login import current_user
 from flask_wtf import FlaskForm
 from flask_wtf.file import FileField, FileRequired, FileAllowed
 from werkzeug.utils import secure_filename
-from wtforms import StringField, SubmitField, TextAreaField, PasswordField
+from wtforms import StringField, SubmitField, TextAreaField, PasswordField, FloatField
 from wtforms.validators import (
     InputRequired,
     DataRequired,
@@ -21,10 +21,13 @@ class RegistrationForm(FlaskForm):
         "Username", validators=[InputRequired(), Length(min=1, max=40)]
     )
     email = StringField("Email", validators=[InputRequired(), Email()])
+    first_name = StringField("First Name", validators=[InputRequired()])
+    last_name = StringField("Last Name", validators=[InputRequired()])
     password = PasswordField("Password", validators=[InputRequired()])
     confirm_password = PasswordField(
         "Confirm Password", validators=[InputRequired(), EqualTo("password")]
     )
+    balance = FloatField("Initial Deposit", validators=[InputRequired()])
     submit = SubmitField("Sign Up")
 
     def validate_username(self, username):
