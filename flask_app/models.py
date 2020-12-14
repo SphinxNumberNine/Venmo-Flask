@@ -23,9 +23,11 @@ class User(db.Document, UserMixin):
         return self.username
 
 class Payment(db.Document):
-    payer = db.ReferenceField(User, required=True)
-    receiver = db.ReferenceField(User, required=True)
+    payer = db.ReferenceField('User', required=True)
+    receiver = db.ReferenceField('User', required=True)
+    accepted = db.BooleanField(required=True, default=False)
     comment = db.StringField(required=True, min_length=1, max_length=500)
-    date = db.StringField(required=True)
+    date = db.DateTimeField(required=True)
     amount = db.FloatField(required=True, min_value=0.01, max_value=10000.0)
+    completed = db.BooleanField(required=True, default=False)
     

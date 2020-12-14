@@ -68,12 +68,13 @@ class UpdatePasswordForm(FlaskForm):
     submit = SubmitField("Update Password")
             
 class RequestPaymentForm(FlaskForm):
+    amount = FloatField(label="Amount", validators=[InputRequired()])
     text = TextAreaField(
         "Comment", validators=[InputRequired(), Length(min=5, max=500)]
     )
-    submit = SubmitField("Request Payment")
-
+    send = SubmitField("Request Payment")
 class SendPaymentForm(FlaskForm):
+    amount = FloatField(label="Amount", validators=[InputRequired()])
     text = TextAreaField(
         "Comment", validators=[InputRequired(), Length(min=5, max=500)]
     )
@@ -88,3 +89,13 @@ class AddFriendForm(FlaskForm):
         user = User.objects(username=username.data).first()
         if user is None:
             raise ValidationError("No user found with that username")
+
+def AcceptPaymentRequestForm(requester, amount, comment):
+    class AcceptPaymentRequest(FlaskForm):
+        accept = SubmitField()
+
+    setattr(AcceptPaymentRequest, 'from', requester)
+    setattr(AcceptPaymentRequest, 'amount', amount)
+    setattr(AcceptPaymentRequest, "comment", comment)
+
+    return AcceptPaymentRequest()

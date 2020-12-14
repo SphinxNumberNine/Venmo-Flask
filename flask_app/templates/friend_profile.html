@@ -1,0 +1,71 @@
+{% extends "header.html" %}
+{% block content %}
+<div class="row">
+    <div class="col">
+        <h1>{{friend.username}}</h1>
+        <h3>{{friend.firstname}} {{friend.lastname}}</h3>
+    </div>
+</div>
+<div class="row">
+    <div class="col">
+        <form action="" method="post">
+            {{ send_payment_form.csrf_token }}
+            <div class="form-group">
+                {{ send_payment_form.amount.label(class="form-control-label") }}
+                {{ send_payment_form.amount(class="form-control form-control-lg") }}
+
+                {% if send_payment_form.amount.errors %}
+                <div class="alert alert-warning" role="alert">
+                    {% for error in send_payment_form.amount.errors %}
+                    <span>{{ error }}</span>
+                    {% endfor %}
+                </div>
+                {% endif %}
+
+                {{ send_payment_form.text.label(class="form-control-label") }}
+                {{ send_payment_form.text(class="form-control form-control-lg") }}
+
+                {% if send_payment_form.text.errors %}
+                <div class="alert alert-warning" role="alert">
+                    {% for error in send_payment_form.text.errors %}
+                    <span>{{ error }}</span>
+                    {% endfor %}
+                </div>
+                {% endif %}
+            </div>
+            <div class="form-group">
+                {{ send_payment_form.send }}
+            </div>
+        </form>
+        <form action="" method="post">
+            {{ send_request_form.csrf_token }}
+            <div class="form-group">
+                {{ send_request_form.amount.label(class="form-control-label") }}
+                {{ send_request_form.amount(class="form-control form-control-lg") }}
+
+                {% if send_request_form.amount.errors %}
+                <div class="alert alert-warning" role="alert">
+                    {% for error in send_request_form.amount.errors %}
+                    <span>{{ error }}</span>
+                    {% endfor %}
+                </div>
+                {% endif %}
+
+                {{ send_request_form.text.label(class="form-control-label") }}
+                {{ send_request_form.text(class="form-control form-control-lg") }}
+
+                {% if send_request_form.text.errors %}
+                <div class="alert alert-warning" role="alert">
+                    {% for error in send_request_form.text.errors %}
+                    <span>{{ error }}</span>
+                    {% endfor %}
+                </div>
+                {% endif %}
+            </div>
+            <div class="form-group">
+                {{ send_request_form.send }}
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}>

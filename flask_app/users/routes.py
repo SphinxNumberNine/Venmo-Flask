@@ -2,8 +2,12 @@ from flask import Blueprint, redirect, url_for, render_template, flash, request
 from flask_login import current_user, login_required, login_user, logout_user
 
 from .. import bcrypt
-from ..forms import RegistrationForm, LoginForm, UpdateUsernameForm, UpdatePasswordForm, AddFriendForm, AddCreditsForm
+from ..forms import RegistrationForm, LoginForm, UpdateUsernameForm, UpdatePasswordForm, AddFriendForm, AddCreditsForm, SendPaymentForm, RequestPaymentForm, AcceptPaymentRequestForm
 from ..models import User, Payment
+
+import sys
+
+from datetime import datetime
 
 users = Blueprint('users', __name__)
 
@@ -67,7 +71,20 @@ def account():
     if add_credits_form.validate_on_submit():
         new_balance = current_user.balance + add_credits_form.credit.data
         current_user.modify(balance=new_balance)
-    return render_template("account.html", title="Account", username_form=username_form, password_form=password_form, add_credits_form=add_credits_form)
+        return redirect(url_for("users.account"))
+
+    request_forms = []
+    reqs = Payment.objects(payer=current_user._get_current_object())
+    print(reqs, file=sys.stderr)
+    for req in reqs:
+        form = AcceptPaymentRequestForm(req.receiver, req.amount, req.comment)
+        request_forms.append(form)
+        if form.validate_on_submit():
+            current_user.modify(balance = current_user.balance - req.amount)
+            req.receiver.modify(balance = req.receiver.balance + req.amount)
+            req.modify(accepted = True)
+            return redirect(url_for("users.account"))
+    return render_template("account.html", title="Account", username_form=username_form, password_form=password_form, add_credits_form=add_credits_form, request_forms=request_forms)
 
 @users.route("/search-user/<name>", methods=["GET"])
 @login_required
@@ -94,3 +111,30 @@ def friends():
     for friend in current_user.friends:
         friends.append((friend.firstname, friend.lastname, friend.username))
     return render_template("friends.html", friends=friends, add_friend_form=add_friend_form)
+
+@users.route("/friend/<name>", methods=["GET", "POST"])
+@login_required
+def friend_profile(name):
+    send_payment = SendPaymentForm()
+    sender = current_user
+    reciever = User.objects(username=name).first()
+    if send_payment.validate_on_submit():
+        date = datetime.now()
+        print("send payment clicked", file=sys.stderr)
+        payment = Payment(date=date, payer=current_user._get_current_object(), receiver=reciever, accepted=True, comment=send_payment.text.data, amount=send_payment.amount.data, completed=True)
+        payment.save()
+        reciever.modify(balance = reciever.balance + send_payment.amount.data)
+        sender.modify(balance = sender.balance - send_payment.amount.data)
+        return redirect(url_for("users.friend_profile", name=name))
+    send_request = RequestPaymentForm()
+    if send_request.validate_on_submit():
+        date = datetime.now()
+        print("send request clicked", file=sys.stderr)
+        payment = Payment(date=date, payer=reciever, receiver=current_user._get_current_object(), accepted=False, comment=send_request.text.data, amount=send_request.amount.data, completed=False)
+        payment.save()
+        return redirect(url_for("users.friend_profile", name=name))
+
+    return render_template("friend_profile.html", friend=reciever, send_payment_form = send_payment, send_request_form=send_request)
+
+    
+

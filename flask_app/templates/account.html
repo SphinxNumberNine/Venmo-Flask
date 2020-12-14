@@ -62,6 +62,22 @@
                 {{ add_credits_form.submit }}
             </div>
         </form>
+        <h2>
+            Incoming Payment Requests
+        </h2>
+        {% for request in request_forms %}
+            <form>
+                {{ request.csrf_token }}
+                <div class="form-group" style="margin-left:1em">
+                    <div class="row">
+                        <h5>{{ request.from.username }} - {{ "$%.2f"|format(request.amount) }} - "{{ request.comment }}"</h5>
+                        <div class="form-group" style="margin-left: 50px;">
+                            {{ request.accept }}
+                        </div>
+                    </div>
+                </div>
+            </form>
+        {% endfor %}
     </div>
 </div>
 {% endblock %}>
