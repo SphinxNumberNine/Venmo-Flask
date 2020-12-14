@@ -11,6 +11,10 @@ payments = Blueprint('payments', __name__)
 def send_payment(friend, amount):
     form = SendPaymentForm()
     if form.validate_on_submit() and current_user.is_authenticated:
+        form.validate_credits(form.credit.data)
+        #next_balance = current_user.balance - amount
+        #if next_balance < 0:
+        #    return redirect(url_for("payments.transaction_history"))
         current_user.balance -= amount
         friend.balance += amount
         current_user.save()

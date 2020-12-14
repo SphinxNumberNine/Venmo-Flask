@@ -1,9 +1,13 @@
-from flask import Blueprint, redirect, url_for, render_template, flash, request
+from flask import Blueprint, redirect, url_for, render_template, flash, request, session
 from flask_login import current_user, login_required, login_user, logout_user
 
 from .. import bcrypt
 from ..forms import RegistrationForm, LoginForm, UpdateUsernameForm, UpdatePasswordForm, AddFriendForm, AddCreditsForm
 from ..models import User, Payment
+
+import qrcode.image.svg as svg
+from io import BytesIO
+import pyotp
 
 users = Blueprint('users', __name__)
 
@@ -13,12 +17,50 @@ def register():
         return redirect(url_for("users.index"))
     form = RegistrationForm()
     if form.validate_on_submit():
+        
         hashed = bcrypt.generate_password_hash(form.password.data).decode("utf-8")
         user = User(username=form.username.data, email=form.email.data, password=hashed,
                     firstname=form.first_name.data, lastname=form.last_name.data, balance=form.balance.data)
+        session['new_username'] = user.username
         user.save()
-        return redirect(url_for("users.login"))
+        return redirect(url_for("users.tfa"))
     return render_template("register.html", title="Register", form=form)
+
+@users.route("/tfa")
+def tfa():
+    if 'new_username' not in session:
+        return redirect(url_for('users.index'))
+
+    headers = {
+        'Cache-Control': 'no-cache, no-store, must-revalidate',
+        'Pragma': 'no-cache',
+        'Expires': '0' # Expire immediately, so browser has to reverify everytime
+    }
+
+    return render_template('tfa.html'), headers
+
+@users.route("/qr_code")
+def qr_code():
+    if 'new_username' not in session:
+        return redirect(url_for('users.index'))
+    
+    user = User.objects(username=session['new_username']).first()
+    session.pop('new_username')
+
+    uri = pyotp.totp.TOTP(user.otp_secret).provisioning_uri(name=user.username, issuer_name='CMSC388J-2FA')
+    img = qrcode.make(uri, image_factory=svg.SvgPathImage)
+    stream = BytesIO()
+    img.save(stream)
+
+    headers = {
+        'Content-Type': 'image/svg+xml',
+        'Cache-Control': 'no-cache, no-store, must-revalidate',
+        'Pragma': 'no-cache',
+        'Expires': '0' # Expire immediately, so browser has to reverify everytime
+    }
+
+    return stream.getvalue(), headers
+
 
 @users.route("/login", methods=["GET", "POST"])
 def login():
@@ -87,6 +129,8 @@ def friends():
     if add_friend_form.validate_on_submit():
         friend = User.objects(username=add_friend_form.username.data).first()
         existing_friends = current_user.friends
+        if friend in existing_friends:
+            return redirect(url_for('users.friends'))
         existing_friends.append(friend)
         current_user.modify(friends=existing_friends)
         return redirect(url_for('users.friends'))
