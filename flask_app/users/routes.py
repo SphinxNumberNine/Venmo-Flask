@@ -5,6 +5,7 @@ from .. import bcrypt
 from ..forms import RegistrationForm, LoginForm, UpdateUsernameForm, UpdatePasswordForm, AddFriendForm, AddCreditsForm
 from ..models import User, Payment
 
+import qrcode
 import qrcode.image.svg as svg
 from io import BytesIO
 import pyotp
@@ -65,7 +66,7 @@ def qr_code():
 @users.route("/login", methods=["GET", "POST"])
 def login():
     if current_user.is_authenticated:
-        return redirect(url_for("users.index"))
+        return redirect(url_for("users.account"))
     form = LoginForm()
     if form.validate_on_submit():
         user = User.objects(username=form.username.data).first()

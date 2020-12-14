@@ -47,9 +47,9 @@ class LoginForm(FlaskForm):
     password = PasswordField("Password", validators=[InputRequired()])
     submit = SubmitField("Login")
     def validate_token(self, token):
-        user = User.query.filter_by(username=self.username.data).first()
+        user = User.objects(username=self.username.data).first()
         if user is not None:
-            tok_verified = pyotp.TOTP(user.otp_secret).verify(token.data)
+            tok_verified = pyotp.TOTP(user.otp_secret).verify(self.token.data)
             if not tok_verified:
                 raise ValidationError("Invalid Token")
 
