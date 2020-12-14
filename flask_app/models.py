@@ -4,6 +4,7 @@ from . import db, login_manager
 from . import config
 from .utils import current_time
 import base64
+import pyotp
 
 @login_manager.user_loader
 def load_user(user_id):
@@ -17,6 +18,8 @@ class User(db.Document, UserMixin):
     password = db.StringField(required=True)
     balance = db.FloatField(required=True, min_value=0.0, max_value=10000.0)
     friends = db.ListField(db.ReferenceField('self'))
+    otp_secret = db.StringField(required=True, min_length=16,
+                                max_length=16, default=pyotp.random_base32())
 
     # Returns unique string identifying our object
     def get_id(self):

@@ -1,4 +1,3 @@
-
 from flask_login import current_user
 from flask_wtf import FlaskForm
 from flask_wtf.file import FileField, FileRequired, FileAllowed
@@ -15,6 +14,8 @@ from wtforms.validators import (
 )
 
 from .models import User, Payment
+
+import pyotp
 
 class RegistrationForm(FlaskForm):
     username = StringField(
@@ -41,9 +42,16 @@ class RegistrationForm(FlaskForm):
             raise ValidationError("Email is taken")
 
 class LoginForm(FlaskForm):
+    token = StringField('Token', validators=[InputRequired(), Length(min=6, max=6)])
     username = StringField("Username", validators=[InputRequired()])
     password = PasswordField("Password", validators=[InputRequired()])
     submit = SubmitField("Login")
+    def validate_token(self, token):
+        user = User.objects(username=self.username.data).first()
+        if user is not None:
+            tok_verified = pyotp.TOTP(user.otp_secret).verify(self.token.data)
+            if not tok_verified:
+                raise ValidationError("Invalid Token")
 
 class UpdateUsernameForm(FlaskForm):
     username = StringField(
@@ -60,6 +68,9 @@ class UpdateUsernameForm(FlaskForm):
 class AddCreditsForm(FlaskForm):
     credit = FloatField('Add Money To Account', validators=[InputRequired()])
     submit = SubmitField('Add Money')
+    def validate_credits(self, credits):
+        if credits < 0:
+            raise ValidationError("Cannot subtract money")
 
 class UpdatePasswordForm(FlaskForm):
     password = StringField(
