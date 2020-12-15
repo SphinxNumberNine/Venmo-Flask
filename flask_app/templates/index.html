@@ -4,28 +4,22 @@
 <div class="row">
     <div class="col">
         <form action="/" class="form-inline my-2 my-lg-0" method="POST">
-            {% with messages = get_flashed_messages() %}
-                {% if messages %}
-                    {% for message in messages %}
-                        <div class="alert alert-info">
-                            {{ message }}
-                        </div>
-                    {% endfor %}
-                {% endif %}
-            {% endwith %}
+            <h1>Venmo Clone</h1>
+	</form>
+    </div>
+</div>
 
-            {{ form.csrf_token }}
-            {{ form.search_query(class="form-control", placeholder="Search") }}
-
-            {% if form.search_query.errors %}
-            <div class="alert alert-warning" role="alert">
-                {% for error in form.search_query.errors %}
-                <span>{{ error }}</span>
-                {% endfor %}
-            </div>
-            {% endif %}
-
-            {{ form.submit(class="btn btn-outline-success") }}
+<div class="row">
+    <div class="col">
+	<form action="/" class="form-inline my-2 my-lg-0" method="POST">
+	    <h2>Created by Aditya Srinivasan and Ashwath Krishnan</h2>
+	</form>
+    </div>
+</div>
+<div class="row">
+    <div class="col">
+	<form action="/" class="form-inline my-2 my-lg-0" method="POST">
+	    <h3>Enjoy the ease of transactions between friends through this 3rd party service!</h3> 
         </form>
     </div>
 </div>
