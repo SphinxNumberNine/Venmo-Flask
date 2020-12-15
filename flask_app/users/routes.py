@@ -82,13 +82,8 @@ def login():
     return render_template("login.html", title="Login", form=form)
 
 @users.route("/", methods=["GET", "POST"])
-@login_required
 def index():
-    # form = SearchForm()
-    # if form.validate_on_submit():
-        # return redirect(url_for("users.account"))
-    # return render_template("index.html", form=form)
-    return "Venmo Clone"
+    return render_template("index.html")
 
 @users.route("/logout")
 @login_required
